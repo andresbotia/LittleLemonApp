@@ -3,10 +3,38 @@ import {View, StyleSheet, Image, Text, TextInput, Button, Alert, TouchableOpacit
 
 const onboarding = () => {
   const [firstName, onChangeFirstName] = React.useState('');
-  const [email, onChangeEmail] = React.useState('');
+  const [email,onChangeEmail] = React.useState('');
+  const [validEmail,onEmailValidation] = React.useState(true);
+  const [validName,onNameValidation] = React.useState(true);
   const onPress = () => Alert.alert('Button with adjusted color pressed');
 
-  
+  let onUpdatedFirstName = ( name: string ) => {
+
+    if ( (!/[^a-zA-Z]/.test(name)) && name != '') {
+      onChangeFirstName(name);
+      onNameValidation(true);
+    }
+    else {
+      onChangeFirstName(name);
+      onNameValidation(false);
+    }
+}
+
+
+  let onUpdatedEmail = ( email: string ) => {
+
+    // don't remember from where i copied this code, but this works.
+    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if ( re.test(email) ) {
+        onChangeEmail(email);
+        onEmailValidation(true);
+    }
+    else {
+        onChangeEmail(email);
+        onEmailValidation(false);
+    }
+}
   return (
     <View style={{flex: 1, backgroundColor: '#CBD2D9'}}>
       <View style={{height: 175, backgroundColor: '#F1F4F7'}}>
@@ -27,21 +55,24 @@ const onboarding = () => {
           <Text style={styles.headerFirstName}>First Name</Text>
           <TextInput
             style={styles.input}
-            onChangeText={onChangeFirstName}
+            onChangeText={onUpdatedFirstName}
             value={firstName}
           />
+          { !validName ? <Text style={styles.invalidEmail} >Invalid name contains invalid character or is empty </Text> : null }
           <Text style={styles.headerFirstName}>Email</Text>
           <TextInput
             style={styles.input}
-            onChangeText={onChangeEmail}
+            onChangeText={onUpdatedEmail}
+            inputMode='email'
             value={email}
           />
+          { !validEmail ? <Text style={styles.invalidEmail} >Invalid Email</Text> : null }
         </View>
         
       </View>
       <View style={{height: 150, backgroundColor: '#F1F4F7'}}>
       <View style={styles.footerContainer}>  
-      <TouchableOpacity style={styles.button} onPress={onPress}>
+      <TouchableOpacity style={styles.button} onPress={onPress}  disabled={!validEmail || !validName}>
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
         </View>
@@ -68,6 +99,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 600,
     color: '#647582'
+  },
+  invalidEmail:{
+    fontSize: 10,
+    fontWeight: 600,
+    color: 'red'
   },
   input: {
     height: 40,
